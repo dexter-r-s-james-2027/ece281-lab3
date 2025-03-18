@@ -86,18 +86,64 @@ end top_basys3;
 architecture top_basys3_arch of top_basys3 is 
   
 	-- declare components
+	component thunderbird_fsm is
+	port (
+        i_clk, i_reset  : in    std_logic; --synchronous reset from btnR
+        i_left, i_right : in    std_logic;
+        o_lights_L      : out   std_logic_vector(2 downto 0);
+        o_lights_R      : out   std_logic_vector(2 downto 0)
+    );
+end component thunderbird_fsm;
+
+component clock_divider is
+	generic ( constant k_DIV : natural := 2	);
+	port ( 	i_clk    : in std_logic;		   -- basys3 clk
+			i_reset  : in std_logic;		   -- asynchronous reset from btnC 
+			o_clk    : out std_logic		   -- divided (slow) clock
+	);
+end component clock_divider;
+
+    	signal w_clk : std_logic;		--this wire provides the connection between o_clk and stoplight clk
+    	
+    	signal left_leds: std_logic_vector(2 downto 0);   --house the outputs of fsm 
+    	
+    	
+    	signal right_leds: std_logic_vector(2 downto 0); -- house the outputs of fsm 
 
   
 begin
 	-- PORT MAPS ----------------------------------------
+	
+	thunderbird_fsm_inst: thunderbird_fsm
+	   port map(
+	   i_clk => w_clk, 
+	   i_reset => btnR,
+	   i_left => sw(15),
+	   i_right => sw(0), 
+	   o_lights_L => left_leds,
+	   o_lights_R => right_leds 
+	   );
 
 	
-	
+	clkdiv_inst : clock_divider 		--instantiation of clock_divider to take 
+        generic map ( k_DIV => 50000000 ) -- 1 Hz clock from 100 MHz
+        port map (						  
+            i_clk   => clk,
+            i_reset => btnL,
+            o_clk   => w_clk
+        );   
 	-- CONCURRENT STATEMENTS ----------------------------
+	
+	led(15) <= left_leds(2);
+	led(14) <= left_leds(1);
+	led(13) <= left_leds(0);
+	
+	led(2) <= right_leds(0);
+	led(1) <= right_leds(1);
+	led(0) <= right_leds(2);
 	
 	-- ground unused LEDs
 	-- leave unused switches UNCONNECTED
-	
 	-- Ignore the warnings associated with these signals
 	-- Alternatively, you can create a different board implementation, 
 	--   or make additional adjustments to the constraints file

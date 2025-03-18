@@ -130,9 +130,22 @@ begin
 	                 or (not f_Q(2) and not f_Q(1) and f_Q(0));   --LB
 	o_lights_L(0) <= (f_Q(2) and f_Q(1))
 	                 or (not f_Q(2) and not f_Q(1) and f_Q(0))
-	                 or (f_Q(2) and not f_Q(0));   --LA
+	                 or (f_Q(2) and not f_Q(0));                 --LA
 	-- PROCESSES --------------------------------------------------------------------
     
-	-----------------------------------------------------clock					   
+	-----------------------------------------------------clock	
+	
+	register_proc: process(i_clk, i_reset)
+        begin
+        if rising_edge(i_clk) then
+            if i_reset = '1' then
+                f_Q <= "000";  -- Reset state (OFF)
+            else
+                f_Q <= f_Q_next;  -- Transition to next state
+            end if;
+        end if;
+    end process register_proc;
+	
+					   
 				  
 end thunderbird_fsm_arch;
