@@ -107,30 +107,62 @@ begin
     ---------------------------------------------------------------------------------
 	
 	--next state 
-	f_Q_next(0) <= (not f_Q(2) and not f_Q(1) and not f_Q(0) and i_left and not i_right) 
-	or (not f_Q(2) and not f_Q(1) and not f_Q(0) and i_left and i_right) 
-	or (not f_Q(2) and f_Q(1) and not f_Q(0)) 
-	or (f_Q(2) and f_Q(1) and not f_Q(0)); 
+	f_Q_next(0) <= (f_Q(2) and f_Q(1) and not f_Q(0))
+	               or (not f_Q(2) and f_Q(1) and not f_Q(0))
+	               or (not f_Q(2) and not f_Q(1) and not f_Q(0) and i_left and i_right)
+	               or (not f_Q(2) and not f_Q(1) and not f_Q(0) and i_left and not i_right);
 	
-	f_Q_next(1) <= (not f_Q(2) and not f_Q(1) and not f_Q(0) and not i_left and i_right) 
-	or (not f_Q(2) and f_Q(1) and not f_Q(0)) 
-	or (f_Q(2) and not f_Q(1) and not f_Q(0)) 
-	or (f_Q(2) and f_Q(1) and not f_Q(0)); 
+	f_Q_next(1) <= (f_Q(2) and f_Q(1) and not f_Q(0))
+	               or (f_Q(2) and not f_Q(1) and f_Q(0))
+	               or (not f_Q(2) and f_Q(1) and not f_Q(0))
+	               or (not f_Q(2) and not f_Q(1) and not f_Q(0) and not i_left and i_right);
+	               
+	f_Q_next(2) <= (f_Q(2) and f_Q(1) and not f_Q(0))
+	               or (f_Q(2) and not f_Q(1) and f_Q(0))
+	               or (not f_Q(2) and f_Q(1) and f_Q(0))
+	               or (not f_Q(2) and not f_Q(1) and not f_Q(0) and i_left and not i_right); --change s2
+	               
+	            
+	            
+	            
+--	            (not f_Q(2) and not f_Q(1) and not f_Q(0) and i_left and not i_right) 
+--	or (not f_Q(2) and not f_Q(1) and not f_Q(0) and i_left and i_right) 
+--	or (not f_Q(2) and f_Q(1) and not f_Q(0)) 
+--	or (f_Q(2) and f_Q(1) and not f_Q(0)); 
+	               
+--	            (not f_Q(2) and not f_Q(1) and not f_Q(0) and not i_left and i_right) 
+--	or (not f_Q(2) and f_Q(1) and not f_Q(0)) 
+--	or (f_Q(2) and not f_Q(1) and not f_Q(0)) 
+--	or (f_Q(2) and f_Q(1) and not f_Q(0)); 
 	
-	f_Q_next(2) <= (not f_Q(2) and not f_Q(1) and not f_Q(0) and i_left and not i_right) 
-	or (not f_Q(2) and f_Q(1) and f_Q(0)) 
-	or (f_Q(2) and not f_Q(1) and f_Q(0)) 
-	or (f_Q(2) and f_Q(1) and not f_Q(0)); 
+--(not f_Q(2) and not f_Q(1) and not f_Q(0) and i_left and not i_right) 
+--	or (not f_Q(2) and f_Q(1) and f_Q(0)) 
+--	or (f_Q(2) and not f_Q(1) and f_Q(0)) 
+--	or (f_Q(2) and f_Q(1) and not f_Q(0)); 
 	
 	--outputs
 	
 	o_lights_L(2) <= (not f_Q(2) and not f_Q(1) and f_Q(0))
 	                 or (f_Q(2) and f_Q(1) and f_Q(0));            --LC
-	o_lights_L(1) <= (f_Q(2) and f_Q(1))
-	                 or (not f_Q(2) and not f_Q(1) and f_Q(0));   --LB
-	o_lights_L(0) <= (f_Q(2) and f_Q(1))
-	                 or (not f_Q(2) and not f_Q(1) and f_Q(0))
-	                 or (f_Q(2) and not f_Q(0));                 --LA
+	                 
+	o_lights_L(1) <= (not f_Q(2) and not f_Q(1) and f_Q(0))	
+	                 or (f_Q(2) and f_Q(1));   --LB
+	                 
+	o_lights_L(0) <= (not f_Q(2) and not f_Q(1) and f_Q(0))	                 
+	                 or (f_Q(2) and f_Q(1))
+	                 or (f_Q(2) and f_Q(0));                 --LA
+	                 
+	o_lights_R(2) <= (f_Q(2) and not f_Q(1) and not f_Q(0))
+                     or (not f_Q(2) and not f_Q(1) and f_Q(0));  --RC     
+                     
+    o_lights_R(1) <= (f_Q(2) and not f_Q(1) and not f_Q(0)) 
+                      or (not f_Q(2) and f_Q(0));      --RB
+                      
+    o_lights_R(0) <= (f_Q(2) and not f_Q(1) and not f_Q(0))
+                      or (not f_Q(2) and  f_Q(1))                 
+                      or (not f_Q(2) and  f_Q(0)) ;  -- RA
+ 
+ 
 	-- PROCESSES --------------------------------------------------------------------
     
 	-----------------------------------------------------clock	
@@ -139,13 +171,12 @@ begin
         begin
         if rising_edge(i_clk) then
             if i_reset = '1' then
-                f_Q <= "000";  -- Reset state (OFF)
+                f_Q <= "000";  -- Reset state (OFF) synchronous reset 
             else
                 f_Q <= f_Q_next;  -- Transition to next state
             end if;
         end if;
     end process register_proc;
 	
-					   
-				  
+					  				  
 end thunderbird_fsm_arch;
